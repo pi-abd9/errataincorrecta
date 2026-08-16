@@ -31,13 +31,14 @@
             transform: translate(-50%, -50%);
             width: 100%;
             max-width: 600px;
+            /* Protects both opacity and spatial transitions */
+            transition: top 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* STATE 1: Default home position */
+        /* STATE 1: Default home position (Absolute Center) */
         body.state-1 .title-container {
             top: 50%;
             opacity: 1;
-            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .cursor {
@@ -65,10 +66,11 @@
             opacity: 0;
             text-align: left;
             position: absolute;
-            top: 36%; 
+            top: 36%; /* Kept safe so text sits fully inside the browser screen */
             left: 50%;
             transform: translate(-50%, 0);
             pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .info-loop p {
@@ -80,6 +82,49 @@
             color: #000000;
             display: inline-block;
             line-height: 1;
+            padding: 0 4px;
+        }
+
+        /* =======================================================
+           CHOREOGRAPHY TIMELINE (THE ANIMATIONS)
+           ======================================================= */
+        
+        /* FIRST CLICK STAGE A: Instant Wipeout into White Void */
+        body.stage-wipeout .title-container,
+        body.stage-wipeout .info-loop {
+            opacity: 0 !important;
+            transition: none !important;
+        }
+
+        /* FIRST CLICK STAGE B & C: The Asynchronous Rebuild at Top 26% */
+        body.stage-reveal-all .title-container {
+            top: 26%; /* Fixed position to stop it from sliding off the top crop */
+            opacity: 0;
+            animation: slowFadeIn 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        body.stage-reveal-all .info-loop {
+            animation: slowFadeIn 1.4s cubic-bezier(0.25, 1, 0.5, 1) 1.2s forwards;
+        }
+
+        @keyframes slowFadeIn {
+            to {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
+        /* SECOND CLICK RESET: Complete, instant screen blackout */
+        body.stage-reset-wipeout .title-container,
+        body.stage-reset-wipeout .info-loop {
+            opacity: 0 !important;
+            transition: none !important;
+        }
+
+        /* THE INTERACTION SHIELD */
+        body.animating {
+            pointer-events: none !important;
+            cursor: default !important;
         }
     </style>
 </head>
@@ -90,7 +135,6 @@
             Errata incorrecta<span class="cursor"></span>
         </div>
         
-        <!-- THE RE-CALIBRATED SECURE ARTISTIC PLACEHOLDER TEXT -->
         <div class="info-loop">
             <p><strong>ARCHIVE LOG // STATUS: UN-AMENDED</strong></p>
             <p>A compilation of one hundred intentional transcription errors, scattered across the public infrastructure. The primary ledger remains open and uncorrected.</p>
@@ -107,12 +151,13 @@
         let activeVoices = []; 
         let sequenceIntervals = []; 
 
-        const duchampNotes = [87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23];
+        // BALANCED LOWER OCTAVE POOL
+        const baseScale = [87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23];
 
         function generateDuchampHat() {
             let hat = [];
             for (let i = 0; i < 25; i++) {
-                hat.push(baseScale[i % baseScale.length]);
+                hat.push(baseScale[i % baseScale.length]); // FIXED: Now correctly references baseScale variable
             }
             for (let i = hat.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -157,12 +202,12 @@
             }
             
             masterGain = audioCtx.createGain();
-            masterGain.gain.setValueAtTime(0.12, audioCtx.currentTime); 
+            masterGain.gain.setValueAtTime(0.12, audioCtx.currentTime); // Sound locked at deep, non-piercing 12%
             masterGain.connect(audioCtx.destination);
 
-            createVoiceLine(1800); 
-            createVoiceLine(2400); 
-            createVoiceLine(3000); 
+            createVoiceLine(1800); // Voice 1
+            createVoiceLine(2400); // Voice 2
+            createVoiceLine(3000); // Voice 3
         }
 
         function stopDuchampChoir() {
@@ -183,6 +228,7 @@
         body.addEventListener('click', function(e) {
             if (e.target.tagName === 'A') return;
             
+            // CLICK 1: Centered -> Void -> Reveal top text and play music
             if (body.classList.contains('state-1')) {
                 body.classList.remove('state-1');
                 body.classList.add('stage-wipeout', 'animating');
@@ -196,21 +242,23 @@
                     setTimeout(() => { body.classList.remove('animating'); }, 2600); 
                 }, 1000); 
             } 
+            // CLICK 2: Full view -> Wipe out -> Return beautifully to center step 1
             else if (body.classList.contains('stage-reveal-all')) {
-                body.classList.remove('stage-reveal-all');
+                body.classList.remove('stage-reveal-all'); 
                 body.classList.add('stage-reset-wipeout', 'animating');
                 
                 stopDuchampChoir(); 
                 
                 setTimeout(() => {
                     body.classList.remove('stage-reset-wipeout');
+                    
                     const title = document.querySelector('.title-container');
                     title.style.transition = 'none';
                     body.classList.add('state-1'); 
                     title.style.opacity = '0';
                     
                     setTimeout(() => {
-                        title.style.transition = 'opacity 1.4s ease-in-out';
+                        title.style.transition = 'top 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.4s ease-in-out';
                         title.style.opacity = '1';
                         setTimeout(() => { body.classList.remove('animating'); }, 1400); 
                     }, 50);
