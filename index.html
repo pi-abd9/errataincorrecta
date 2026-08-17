@@ -166,31 +166,50 @@ function createVoiceLine(speedMs, startingOffset) {
 function startDuchampChoir() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-        masterGain.connect(audioCtx.destination);
-        
-        // Pure single sequence generation for the whole choir
-        globalSharedHat = generateDuchampHat(); 
-        
-        // The master voice alongside two drifting, delayed system error copies (the errata)
-        createVoiceLine(2000, 0);  // Master Voice 
-        createVoiceLine(2040, 5);  // First Errata: Delayed by 5 notes, drifting slightly slower
-        createVoiceLine(2080, 10); // Second Errata: Delayed by 10 notes, drifting even slower
     }
+    // Resume context if suspended by browser security policy
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    masterGain.connect(audioCtx.destination);
+    
+    // Pure single sequence generation for the whole choir
+    globalSharedHat = generateDuchampHat(); 
+    
+    // The master voice alongside two drifting, delayed system error copies (the errata)
+    createVoiceLine(2000, 0);  // Master Voice 
+    createVoiceLine(2040, 5);  // First Errata: Delayed by 5 notes, drifting slightly slower
+    createVoiceLine(2080, 10); // Second Errata: Delayed by 10 notes, drifting even slower
 }
 
 function stopDuchampChoir() {
+    // 1. Clear all active beat timers instantly
     sequenceIntervals.forEach(interval => clearInterval(interval));
     sequenceIntervals = [];
+    
     if (masterGain && audioCtx) {
+        // 2. Exponentially fade out to smooth over unwanted audio clicks
         masterGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
+        
+        // Capture a local reference to voices to shut down after the fade out completes
+        const voicesToStop = [...activeVoices];
+        activeVoices = []; // Reset storage instantly so next click can begin empty
+        
         setTimeout(() => {
-            activeVoices.forEach(osc => { try { osc.stop(); osc.disconnect(); } catch(e) {} });
-            if (masterGain) { masterGain.disconnect(); }
-            activeVoices = [];
+            voicesToStop.forEach(osc => { 
+                try { 
+                    osc.stop(); 
+                    osc.disconnect(); 
+                } catch(e) {} 
+            });
+            if (masterGain) { 
+                try { masterGain.disconnect(); } catch(e) {}
+            }
             masterGain = null;
-        }, 600);
+        }, 650);
     }
 }
 
@@ -226,4 +245,3 @@ body.addEventListener('click', function(e) {
 </script>
 </body>
 </html>
-
