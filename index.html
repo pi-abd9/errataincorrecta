@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +20,6 @@
             box-sizing: border-box;
         }
 
-        /* 1. TITLE CONTAINER */
         .title-container {
             font-size: 3rem;
             font-weight: normal;
@@ -31,13 +31,12 @@
             transform: translate(-50%, -50%);
             width: 100%;
             max-width: 600px;
+            transition: top 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* STATE 1: Default home position */
         body.state-1 .title-container {
             top: 50%;
             opacity: 1;
-            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .cursor {
@@ -55,7 +54,6 @@
             50% { background-color: #000000; }
         }
 
-        /* 2. MANIFESTO CONTAINER */
         .info-loop {
             max-width: 600px;
             width: 90%;
@@ -65,21 +63,17 @@
             opacity: 0;
             text-align: left;
             position: absolute;
-            top: 36%; 
+            top: 40%; 
             left: 50%;
             transform: translate(-50%, 0);
             pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .info-loop p {
             margin-bottom: 24px;
         }
 
-        .info-loop strong {
-            color: #000000;
-        }
-
-        /* TIMELINE ANIMATIONS */
         body.stage-wipeout .title-container,
         body.stage-wipeout .info-loop {
             opacity: 0 !important;
@@ -123,11 +117,9 @@
         </div>
         
         <div class="info-loop">
-            <p><strong>CONDITIONS OF RECOVERY: ITEM NO. 1–100</strong></p>
-            <p>You are in physical possession of an un-amended, unpublished literary asset. Because each manuscript contains a unique, intentional transcription error, no second copy exists in the world.</p>
-            <p>The financial reward for surrendering this page is fixed at a dynamic percentage of the verified market valuation of the total archive, calculated at the exact timestamp of physical presentation.</p>
-            <p>To initiate secure, offline return protocols and finalize your claim, forward the physical artifact directly to the exhibition repository: <strong>[Gallery Name, Address, London]</strong>.</p>
-            <p>Contact: <strong>[Your Proton Email]</strong></p>
+            <p>You have entered the digital and acoustic space of an art project.</p>
+            <p>A single text scattered in the city, awaiting physical recovery.</p>
+            <p style="margin-top: 36px;"><em>More information to follow...</em></p>
         </div>
     </div>
 
@@ -138,19 +130,37 @@
         let activeVoices = []; 
         let sequenceIntervals = []; 
 
-        // BALANCED LOWER OCTAVE POOL: Shifted down to warmer, deeper, more eerie frequencies
+        // THE FIXED ARCHIVAL SCALE POOL
         const baseScale = [87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23];
+        
+        // GLOBAL ARCHIVE DATA LAYER
+        let masterHat = [];
+        let masterCardIndex = 0;
 
-        function generateDuchampHat() {
+        // THE UNIFIED 75-CARD DECK SHARED BY ALL THREE VOICES
+        function generateUnifiedMasterHat() {
             let hat = [];
-            for (let i = 0; i < 25; i++) {
+            // Fill a singular hat with 75 notes (3 perfect iterations of the 25 notes)
+            for (let i = 0; i < 75; i++) {
                 hat.push(baseScale[i % baseScale.length]);
             }
+            // Shuffle the complete 75-card master archive
             for (let i = hat.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [hat[i], hat[j]] = [hat[j], hat[i]];
             }
             return hat;
+        }
+
+        // Draw a card dynamically from the single, shared, non-repeating archive pool
+        function drawNextMasterCard() {
+            if (masterCardIndex >= masterHat.length) {
+                masterHat = generateUnifiedMasterHat(); // Completely replenish and reshuffle when empty
+                masterCardIndex = 0;
+            }
+            const note = masterHat[masterCardIndex];
+            masterCardIndex++;
+            return note;
         }
 
         function createVoiceLine(speedMs) {
@@ -160,23 +170,17 @@
             const voiceGain = audioCtx.createGain();
             voiceGain.gain.setValueAtTime(0.04, audioCtx.currentTime); 
             
-            let currentHat = generateDuchampHat();
-            let cardIndex = 0;
-            
-            osc.frequency.setValueAtTime(currentHat[cardIndex], audioCtx.currentTime);
+            // All voices pull their starting notes from the same unified deck index
+            osc.frequency.setValueAtTime(drawNextMasterCard(), audioCtx.currentTime);
             
             osc.connect(voiceGain);
             voiceGain.connect(masterGain);
             osc.start();
             activeVoices.push(osc);
 
+            // Independent timer loops draw from the SAME card pool, shattering the planar harmony
             const interval = setInterval(() => {
-                cardIndex++;
-                if (cardIndex >= 25) {
-                    currentHat = generateDuchampHat();
-                    cardIndex = 0;
-                }
-                const nextFreq = currentHat[cardIndex];
+                const nextFreq = drawNextMasterCard();
                 osc.frequency.exponentialRampToValueAtTime(nextFreq, audioCtx.currentTime + 0.6);
             }, speedMs);
             
@@ -189,8 +193,12 @@
             }
             
             masterGain = audioCtx.createGain();
-            masterGain.gain.setValueAtTime(0.12, audioCtx.currentTime); // Volume balanced elegantly at 12%
+            masterGain.gain.setValueAtTime(0.12, audioCtx.currentTime); 
             masterGain.connect(audioCtx.destination);
+
+            // Generate the shared 75-card pool fresh upon interaction
+            masterHat = generateUnifiedMasterHat();
+            masterCardIndex = 0;
 
             createVoiceLine(1800); // Yvonne
             createVoiceLine(2400); // Magdeleine
@@ -215,7 +223,6 @@
         body.addEventListener('click', function(e) {
             if (e.target.tagName === 'A') return;
             
-            // CLICK 1: Centered -> Void -> Reveal top text and play music
             if (body.classList.contains('state-1')) {
                 body.classList.remove('state-1');
                 body.classList.add('stage-wipeout', 'animating');
@@ -229,25 +236,22 @@
                     setTimeout(() => { body.classList.remove('animating'); }, 2600); 
                 }, 1000); 
             } 
-            // CLICK 2 (FIXED TRIGGER): Full view -> Wipe out -> Return beautifully to center step 1
             else if (body.classList.contains('stage-reveal-all')) {
-                body.classList.remove('stage-reveal-all'); // Typo corrected here
+                body.classList.remove('stage-reveal-all');
                 body.classList.add('stage-reset-wipeout', 'animating');
                 
                 stopDuchampChoir(); 
                 
                 setTimeout(() => {
                     body.classList.remove('stage-reset-wipeout');
-                    
                     const title = document.querySelector('.title-container');
                     title.style.transition = 'none';
-                    body.classList.add('state-1'); // Safely triggers structural center layout rules
+                    body.classList.add('state-1'); 
                     title.style.opacity = '0';
                     
                     setTimeout(() => {
-                        title.style.transition = 'opacity 1.4s ease-in-out';
+                        title.style.transition = 'top 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.4s ease-in-out';
                         title.style.opacity = '1';
-                        
                         setTimeout(() => { body.classList.remove('animating'); }, 1400); 
                     }, 50);
                 }, 800); 
