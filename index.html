@@ -100,6 +100,15 @@ body.stage-pi-voice .code-display.corrected-block {
 opacity: 1;
 pointer-events: auto;
 }
+.serif-text {
+font-family: "Georgia", "Times New Roman", serif;
+font-size: 1.1rem;
+color: #222222;
+display: block;
+margin-top: 14px;
+margin-bottom: 14px;
+font-style: italic;
+}
 body.stage-wipeout .title-container,
 body.stage-wipeout .info-loop,
 body.stage-wipeout .code-display,
@@ -126,25 +135,23 @@ Errata incorrecta<span class="cursor"></span>
 <p style="margin-top: 36px;"><em>More information to follow...</em></p>
 </div>
 
+<!-- STAGE 2 VISUAL: THE ERRATA -->
 <div class="code-display errata-block">function startVoiceOfPi() {
   stopDuchampChoirSoundOnly();
   masterGain = audioCtx.createGain();
   masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
-  
-  // Errata: connection loop error
+<span class="serif-text">πί is playing silently in a closed circle</span>
   masterGain.connect(masterGain); 
-  
-  // πί is playing silently in a closed circle.
   createVoiceLine(scaleOfPi, 3000); 
 }</div>
 
+<!-- STAGE 3 VISUAL: THE CORRECTION -->
 <div class="code-display corrected-block">function startVoiceOfPi() {
   stopDuchampChoirSoundOnly();
   masterGain = audioCtx.createGain();
   masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
   masterGain.connect(audioCtx.destination); 
-  
-  // The voice variation of πί replaces Marcel
+<span class="serif-text">My voice, with a natural baseline frequency of 327 Hz, enters the code as an idealized, mathematical crystal version, replacing Marcel's own geometric and abstract voice:</span>
   createVoiceLine(baseScale, 1800);  // Yvonne
   createVoiceLine(baseScale, 2400);  // Magdeleine
   createVoiceLine(scaleOfPi, 3000);  // πί (replaces Marcel)
@@ -217,13 +224,18 @@ createVoiceLine(scaleOfPi, 3000);
 }
 
 function startAudiblePiScale() {
-stopDuchampChoirSoundOnly();
+// Forcefully dump and destroy any active oscillator notes hanging in browser cache memory
+sequenceIntervals.forEach(interval => clearInterval(interval));
+sequenceIntervals = [];
+activeVoices.forEach(osc => { try { osc.stop(); osc.disconnect(); } catch(e) {} });
+activeVoices = [];
+
 masterGain = audioCtx.createGain();
 masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
 masterGain.connect(audioCtx.destination); 
-createVoiceLine(baseScale, 1800);  // Yvonne continues playing normally
-createVoiceLine(baseScale, 2400);  // Magdeleine continues playing normally
-createVoiceLine(scaleOfPi, 3000);  // Your custom Scale of πί replaces Marcel infinitely
+createVoiceLine(baseScale, 1800);  // Yvonne plays cleanly
+createVoiceLine(baseScale, 2400);  // Magdeleine plays cleanly
+createVoiceLine(scaleOfPi, 3000);  // Your mathematical voice of πί replaces Marcel perfectly
 }
 
 function stopDuchampChoirSoundOnly() {
@@ -277,4 +289,5 @@ setTimeout(() => { body.classList.remove('animating'); }, 1400);
 </script>
 </body>
 </html>
+
 
