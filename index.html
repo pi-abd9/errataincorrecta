@@ -135,14 +135,12 @@ Errata incorrecta<span class="cursor"></span>
 <p style="margin-top: 36px;"><em>More information to follow...</em></p>
 </div>
 
-<!-- STAGE 2 VISUAL: THE ERRATA -->
-<div class="code-display errata-block">function startVoiceOfPi() {
+<!-- STAGE 2 VISUAL: THE ERRATA POETIC SEQUENCE -->
+<div class="code-display errata-block"><span class="serif-text">Errata: connection loop error:</span>function startVoiceOfPi() {
   stopDuchampChoirSoundOnly();
   masterGain = audioCtx.createGain();
   masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
-<span class="serif-text">πί is playing silently in a closed circle</span>
-  // Errata: connection loop error
-  masterGain.connect(masterGain); 
+<span class="serif-text">πί is playing silently in a closed circle</span>  masterGain.connect(masterGain); 
   createVoiceLine(scaleOfPi, 3000); 
 }</div>
 
