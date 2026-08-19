@@ -75,8 +75,6 @@ body.stage-reveal-all .info-loop {
 opacity: 1;
 pointer-events: auto;
 }
-
-/* CODE BLOCKS FOR STAGES 2 & 3 */
 .code-display {
 max-width: 600px;
 width: 90%;
@@ -102,7 +100,6 @@ body.stage-pi-voice .code-display.corrected-block {
 opacity: 1;
 pointer-events: auto;
 }
-
 body.stage-wipeout .title-container,
 body.stage-wipeout .info-loop,
 body.stage-wipeout .code-display,
@@ -129,7 +126,6 @@ Errata incorrecta<span class="cursor"></span>
 <p style="margin-top: 36px;"><em>More information to follow...</em></p>
 </div>
 
-<!-- STAGE 2 VISUAL: THE ERRATA -->
 <div class="code-display errata-block">function startVoiceOfPi() {
   stopDuchampChoirSoundOnly();
   masterGain = audioCtx.createGain();
@@ -139,20 +135,19 @@ Errata incorrecta<span class="cursor"></span>
   masterGain.connect(masterGain); 
   
   // πί is playing silently in a closed circle.
-  createVoiceLine(scaleOfPi, 900); 
+  createVoiceLine(scaleOfPi, 3000); 
 }</div>
 
-<!-- STAGE 3 VISUAL: THE CORRECTION -->
 <div class="code-display corrected-block">function startVoiceOfPi() {
   stopDuchampChoirSoundOnly();
   masterGain = audioCtx.createGain();
   masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
-  
-  // Errata corrected: direct speaker patch
   masterGain.connect(audioCtx.destination); 
   
-  // The acoustic scale of πί breaks the circle.
-  createVoiceLine(scaleOfPi, 900); 
+  // The voice variation of πί replaces Marcel
+  createVoiceLine(baseScale, 1800);  // Yvonne
+  createVoiceLine(baseScale, 2400);  // Magdeleine
+  createVoiceLine(scaleOfPi, 3000);  // πί (replaces Marcel)
 }</div>
 </div>
 
@@ -163,7 +158,7 @@ let masterGain = null;
 let activeVoices = [];
 let sequenceIntervals = [];
 const baseScale = [87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23];
-const balanceOfPi = [40.87, 81.75, 122.62, 163.50, 218.00, 327.00, 490.50, 654.00];
+const scaleOfPi = [40.87, 81.75, 122.62, 163.50, 218.00, 327.00, 490.50, 654.00];
 
 function generateDuchampHat(scale) {
 let hat = [];
@@ -208,27 +203,27 @@ audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 masterGain = audioCtx.createGain();
 masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
 masterGain.connect(audioCtx.destination);
-createVoiceLine(baseScale, 1800);
-createVoiceLine(baseScale, 2400);
-createVoiceLine(baseScale, 3000);
+createVoiceLine(baseScale, 1800); // Yvonne
+createVoiceLine(baseScale, 2400); // Magdeleine
+createVoiceLine(baseScale, 3000); // Marcel
 }
 
 function startSilentPiLoop() {
-// This executes the intentional mistake, muting the audio layout entirely
 stopDuchampChoirSoundOnly();
 masterGain = audioCtx.createGain();
 masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
-masterGain.connect(masterGain); // The silent closed feedback loop
-createVoiceLine(balanceOfPi, 900);
+masterGain.connect(masterGain); 
+createVoiceLine(scaleOfPi, 3000);
 }
 
 function startAudiblePiScale() {
-// Breaking the loop out into physical laptop speaker outputs
 stopDuchampChoirSoundOnly();
 masterGain = audioCtx.createGain();
 masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
-masterGain.connect(audioCtx.destination); // Direct audio patch
-createVoiceLine(balanceOfPi, 900);
+masterGain.connect(audioCtx.destination); 
+createVoiceLine(baseScale, 1800);  // Yvonne continues playing normally
+createVoiceLine(baseScale, 2400);  // Magdeleine continues playing normally
+createVoiceLine(scaleOfPi, 3000);  // Your custom Scale of πί replaces Marcel infinitely
 }
 
 function stopDuchampChoirSoundOnly() {
@@ -247,8 +242,6 @@ masterGain = null;
 
 body.addEventListener('click', function(e) {
 if (e.target.tagName === 'A') return;
-
-// 1. Initial State -> Manifesto text & Choir sound
 if (body.classList.contains('state-1')) {
 body.classList.remove('state-1');
 body.classList.add('stage-wipeout', 'animating');
@@ -258,25 +251,19 @@ body.classList.add('stage-reveal-all');
 startDuchampChoir();
 setTimeout(() => { body.classList.remove('animating'); }, 1500);
 }, 600);
-} 
-// 2. Manifesto text -> Silent Errata Loop code display
-else if (body.classList.contains('stage-reveal-all')) {
+} else if (body.classList.contains('stage-reveal-all')) {
 body.classList.add('animating');
 body.classList.remove('stage-reveal-all');
 body.classList.add('stage-errata-silence');
 startSilentPiLoop();
 setTimeout(() => { body.classList.remove('animating'); }, 1000);
-} 
-// 3. Silent Errata code -> Corrected code display & Sound activates
-else if (body.classList.contains('stage-errata-silence')) {
+} else if (body.classList.contains('stage-errata-silence')) {
 body.classList.add('animating');
 body.classList.remove('stage-errata-silence');
 body.classList.add('stage-pi-voice');
 startAudiblePiScale();
 setTimeout(() => { body.classList.remove('animating'); }, 1000);
-}
-// 4. Corrected code -> Full blackout reset back to State-1
-else if (body.classList.contains('stage-pi-voice')) {
+} else if (body.classList.contains('stage-pi-voice')) {
 body.classList.remove('stage-pi-voice');
 body.classList.add('stage-reset-wipeout', 'animating');
 stopDuchampChoirSoundOnly();
