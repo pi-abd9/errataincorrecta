@@ -141,6 +141,7 @@ Errata incorrecta<span class="cursor"></span>
   masterGain = audioCtx.createGain();
   masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
 <span class="serif-text">πί is playing silently in a closed circle</span>
+  // Errata: connection loop error
   masterGain.connect(masterGain); 
   createVoiceLine(scaleOfPi, 3000); 
 }</div>
@@ -224,7 +225,6 @@ createVoiceLine(scaleOfPi, 3000);
 }
 
 function startAudiblePiScale() {
-// Forcefully dump and destroy any active oscillator notes hanging in browser cache memory
 sequenceIntervals.forEach(interval => clearInterval(interval));
 sequenceIntervals = [];
 activeVoices.forEach(osc => { try { osc.stop(); osc.disconnect(); } catch(e) {} });
@@ -233,9 +233,9 @@ activeVoices = [];
 masterGain = audioCtx.createGain();
 masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
 masterGain.connect(audioCtx.destination); 
-createVoiceLine(baseScale, 1800);  // Yvonne plays cleanly
-createVoiceLine(baseScale, 2400);  // Magdeleine plays cleanly
-createVoiceLine(scaleOfPi, 3000);  // Your mathematical voice of πί replaces Marcel perfectly
+createVoiceLine(baseScale, 1800);  // Yvonne
+createVoiceLine(baseScale, 2400);  // Magdeleine
+createVoiceLine(scaleOfPi, 3000);  // πί (replaces Marcel)
 }
 
 function stopDuchampChoirSoundOnly() {
@@ -289,5 +289,4 @@ setTimeout(() => { body.classList.remove('animating'); }, 1400);
 </script>
 </body>
 </html>
-
 
