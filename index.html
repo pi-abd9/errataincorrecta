@@ -17,7 +17,6 @@ width: 100vw;
 height: 100vh;
 box-sizing: border-box;
 }
-/* 1. TITLE CONTAINER */
 .title-container {
 font-size: 3rem;
 font-weight: normal;
@@ -31,9 +30,13 @@ width: 100%;
 max-width: 600px;
 transition: top 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
 }
-/* STATE 1: Default home position (Absolute Center) */
 body.state-1 .title-container {
 top: 50%;
+opacity: 1;
+}
+body.stage-reveal-all .title-container,
+body.stage-pi-voice .title-container {
+top: 26%;
 opacity: 1;
 }
 .cursor {
@@ -49,7 +52,6 @@ vertical-align: middle;
 from, to { background-color: transparent }
 50% { background-color: #000000; }
 }
-/* 2. MANIFESTO CONTAINER */
 .info-loop {
 max-width: 600px;
 width: 90%;
@@ -68,37 +70,40 @@ transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 .info-loop p {
 margin-bottom: 24px;
 }
-/* ==
-CHOREOGRAPHY TIMELINE (THE ANIMATIONS)
-====================================== */
-/* FIRST CLICK STAGE A: Instant Wipeout into White Void */
-body.stage-wipeout .title-container,
-body.stage-wipeout .info-loop {
-opacity: 0 !important;
-transition: none !important;
-}
-/* FIRST CLICK STAGE B & C: The Asynchronous Rebuild at Top 26% */
-body.stage-reveal-all .title-container {
-top: 26%;
-opacity: 0;
-animation: slowFadeIn 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
 body.stage-reveal-all .info-loop {
-animation: slowFadeIn 1.4s cubic-bezier(0.25, 1, 0.5, 1) 1.2s forwards;
-}
-@keyframes slowFadeIn {
-to {
 opacity: 1;
 pointer-events: auto;
 }
+.code-display {
+max-width: 600px;
+width: 90%;
+font-family: "Courier New", Courier, monospace;
+font-size: 0.9rem;
+line-height: 1.5;
+color: #555555;
+opacity: 0;
+text-align: left;
+position: absolute;
+top: 40%;
+left: 50%;
+transform: translate(-50%, 0);
+pointer-events: none;
+transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+white-space: pre-wrap;
 }
-/* SECOND CLICK RESET: Complete, instant screen blackout */
+body.stage-pi-voice .code-display {
+opacity: 1;
+pointer-events: auto;
+}
+body.stage-wipeout .title-container,
+body.stage-wipeout .info-loop,
+body.stage-wipeout .code-display,
 body.stage-reset-wipeout .title-container,
-body.stage-reset-wipeout .info-loop {
+body.stage-reset-wipeout .info-loop,
+body.stage-reset-wipeout .code-display {
 opacity: 0 !important;
 transition: none !important;
 }
-/* THE INTERACTION SHIELD */
 body.animating {
 pointer-events: none !important;
 cursor: default !important;
@@ -110,12 +115,23 @@ cursor: default !important;
 <div class="title-container">
 Errata incorrecta<span class="cursor"></span>
 </div>
-<!-- THE RE-CALIBRATED INTERACTIVE MANIFESTO -->
 <div class="info-loop">
 <p>You have entered the digital and acoustic space of an art project.</p>
 <p>A single text scattered in the city, awaiting physical recovery.</p>
 <p style="margin-top: 36px;"><em>More information to follow...</em></p>
 </div>
+<div class="code-display">const piVocalBaseline = 327.00; // Hz
+const scaleOfPi = [
+  40.87,  // Sub-Bass
+  81.75,  // Bass
+  122.62, // Low Baritone
+  163.50, // Tenor
+  218.00, // Alt
+  327.00, // Baseline (E4)
+  490.50, // High Soprano
+  654.00  // Shimmer
+];
+createVoiceLine(scaleOfPi, 900); // Voice of πί</div>
 </div>
 <script>
 const body = document.body;
@@ -123,102 +139,108 @@ let audioCtx = null;
 let masterGain = null;
 let activeVoices = [];
 let sequenceIntervals = [];
-
 const baseScale = [87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23];
+const scaleOfPi = [40.87, 81.75, 122.62, 163.50, 218.00, 327.00, 490.50, 654.00];
 
-function generateDuchampHat() {
-    let hat = [];
-    for (let i = 0; i < 25; i++) {
-        hat.push(baseScale[i % baseScale.length]);
-    }
-    for (let i = hat.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [hat[i], hat[j]] = [hat[j], hat[i]];
-    }
-    return hat;
+function generateDuchampHat(scale) {
+let hat = [];
+for (let i = 0; i < 25; i++) {
+hat.push(scale[i % scale.length]);
+}
+for (let i = hat.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[hat[i], hat[j]] = [hat[j], hat[i]];
+}
+return hat;
 }
 
-function createVoiceLine(speedMs) {
-    const osc = audioCtx.createOscillator();
-    osc.type = 'sine';
-    const voiceGain = audioCtx.createGain();
-    voiceGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-    let currentHat = generateDuchampHat();
-    let cardIndex = 0;
-    osc.frequency.setValueAtTime(currentHat[cardIndex], audioCtx.currentTime);
-    osc.connect(voiceGain);
-    voiceGain.connect(masterGain);
-    osc.start();
-    activeVoices.push(osc);
-    const interval = setInterval(() => {
-        cardIndex++;
-        currentHat = generateDuchampHat();
-        if (cardIndex >= 25) {
-            cardIndex = 0;
-        }
-        const nextFreq = currentHat[cardIndex];
-        osc.frequency.exponentialRampToValueAtTime(nextFreq, audioCtx.currentTime + 0.6);
-    }, speedMs);
-    sequenceIntervals.push(interval);
+function createVoiceLine(scale, speedMs) {
+const osc = audioCtx.createOscillator();
+osc.type = 'sine';
+const voiceGain = audioCtx.createGain();
+voiceGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+let currentHat = generateDuchampHat(scale);
+let cardIndex = 0;
+osc.frequency.setValueAtTime(currentHat[cardIndex], audioCtx.currentTime);
+osc.connect(voiceGain);
+voiceGain.connect(masterGain);
+osc.start();
+activeVoices.push(osc);
+const interval = setInterval(() => {
+cardIndex++;
+if (cardIndex >= 25) {
+currentHat = generateDuchampHat(scale);
+cardIndex = 0;
+}
+const nextFreq = currentHat[cardIndex];
+osc.frequency.exponentialRampToValueAtTime(nextFreq, audioCtx.currentTime + 0.6);
+}, speedMs);
+sequenceIntervals.push(interval);
 }
 
 function startDuchampChoir() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    masterGain = audioCtx.createGain();
-    // VOLUME TURNED UP: Increased master gain from 0.12 to 0.22 for a fuller acoustic presence
-    masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime);
-    masterGain.connect(audioCtx.destination);
-    createVoiceLine(1800);
-    createVoiceLine(2400);
-    createVoiceLine(3000);
+if (!audioCtx) {
+audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+masterGain = audioCtx.createGain();
+masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
+masterGain.connect(audioCtx.destination);
+createVoiceLine(baseScale, 1800);
+createVoiceLine(baseScale, 2400);
+createVoiceLine(baseScale, 3000);
 }
 
-function stopDuchampChoir() {
-    sequenceIntervals.forEach(interval => clearInterval(interval));
-    sequenceIntervals = [];
-    if (masterGain && audioCtx) {
-        masterGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
-        setTimeout(() => {
-            activeVoices.forEach(osc => { try { osc.stop(); osc.disconnect(); } catch(e) {} });
-            if (masterGain) { masterGain.disconnect(); }
-            activeVoices = [];
-            masterGain = null;
-        }, 600);
-    }
+function startVoiceOfPi() {
+stopDuchampChoirSoundOnly();
+masterGain = audioCtx.createGain();
+masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
+masterGain.connect(masterGain); // Correct web audio loop connection
+masterGain.connect(audioCtx.destination);
+createVoiceLine(scaleOfPi, 900);
+}
+
+function stopDuchampChoirSoundOnly() {
+sequenceIntervals.forEach(interval => clearInterval(interval));
+sequenceIntervals = [];
+if (masterGain && audioCtx) {
+masterGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+}
+setTimeout(() => {
+activeVoices.forEach(osc => { try { osc.stop(); osc.disconnect(); } catch(e) {} });
+if (masterGain) { try { masterGain.disconnect(); } catch(e) {} }
+activeVoices = [];
+masterGain = null;
+}, 450);
 }
 
 body.addEventListener('click', function(e) {
-    if (e.target.tagName === 'A') return;
-    if (body.classList.contains('state-1')) {
-        body.classList.remove('state-1');
-        body.classList.add('stage-wipeout', 'animating');
-        setTimeout(() => {
-            body.classList.remove('stage-wipeout');
-            body.classList.add('stage-reveal-all');
-            startDuchampChoir();
-            setTimeout(() => { body.classList.remove('animating'); }, 2600);
-        }, 1000);
-    } else if (body.classList.contains('stage-reveal-all')) {
-        body.classList.remove('stage-reveal-all');
-        body.classList.add('stage-reset-wipeout', 'animating');
-        stopDuchampChoir();
-        setTimeout(() => {
-            body.classList.remove('stage-reset-wipeout');
-            const title = document.querySelector('.title-container');
-            title.style.transition = 'none';
-            body.classList.add('state-1');
-            title.style.opacity = '0';
-            setTimeout(() => {
-                title.style.transition = 'top 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.4s ease-in-out';
-                title.style.opacity = '1';
-                setTimeout(() => { body.classList.remove('animating'); }, 1400);
-            }, 50);
-        }, 800);
-    }
+if (e.target.tagName === 'A') return;
+if (body.classList.contains('state-1')) {
+body.classList.remove('state-1');
+body.classList.add('stage-wipeout', 'animating');
+setTimeout(() => {
+body.classList.remove('stage-wipeout');
+body.classList.add('stage-reveal-all');
+startDuchampChoir();
+setTimeout(() => { body.classList.remove('animating'); }, 1500);
+}, 600);
+} else if (body.classList.contains('stage-reveal-all')) {
+body.classList.add('animating');
+body.classList.remove('stage-reveal-all');
+body.classList.add('stage-pi-voice');
+startVoiceOfPi();
+setTimeout(() => { body.classList.remove('animating'); }, 1000);
+} else if (body.classList.contains('stage-pi-voice')) {
+body.classList.remove('stage-pi-voice');
+body.classList.add('stage-reset-wipeout', 'animating');
+stopDuchampChoirSoundOnly();
+setTimeout(() => {
+body.classList.remove('stage-reset-wipeout');
+body.classList.add('state-1');
+setTimeout(() => { body.classList.remove('animating'); }, 1400);
+}, 800);
+}
 });
 </script>
 </body>
 </html>
-
