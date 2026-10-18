@@ -37,7 +37,7 @@ opacity: 1;
 body.stage-reveal-all .title-container,
 body.stage-errata-silence .title-container,
 body.stage-pi-voice .title-container {
-top: 20%;
+top: 15%;
 opacity: 1;
 }
 .cursor {
@@ -54,22 +54,22 @@ from, to { background-color: transparent }
 50% { background-color: #000000; }
 }
 .info-loop {
-font-size: 1.1rem;
+font-size: 1rem;
 max-width: 720px;
 width: 90%;
-line-height: 1.8;
+line-height: 1.7;
 color: #222222;
 opacity: 0;
 text-align: left;
 position: absolute;
-top: 32%;
+top: 26%;
 left: 50%;
 transform: translate(-50%, 0);
 pointer-events: none;
 transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 .info-loop p {
-margin-bottom: 24px;
+margin-bottom: 20px;
 }
 body.stage-reveal-all .info-loop {
 opacity: 1;
@@ -111,23 +111,25 @@ font-style: italic;
 }
 .system-watermark {
 position: absolute;
-bottom: 24px;
+bottom: 16px;
 left: 5%;
 width: 90%;
 font-family: "Courier New", Courier, monospace;
-font-size: 0.85rem;
+font-size: 0.8rem;
 letter-spacing: 2px;
 color: #000000;
 opacity: 0;
 pointer-events: none;
 white-space: nowrap;
 text-transform: uppercase;
+background-color: rgba(255, 255, 255, 0.9);
+padding-top: 4px;
 transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
 }
 body.stage-reveal-all .system-watermark,
 body.stage-errata-silence .system-watermark,
 body.stage-pi-voice .system-watermark {
-opacity: 0.04; 
+opacity: 0.25; 
 }
 body.stage-wipeout .title-container,
 body.stage-wipeout .info-loop,
@@ -160,7 +162,7 @@ Errata incorrecta<span class="cursor"></span>
   • <strong>The Spectator Mode:</strong> Casual interactions run locally in your browser's temporary memory, leaving zero digital footprint.<br>
   • <strong>The GitHub Portal:</strong> Connecting via GitHub authorizes you to interact with the project grid independently. You can sign the public guestbook at any time, or, if you are among the first 100 authenticated human arrivals, claim one unique, certified text error copy permanently stamped into the public ledger view. Beyond user 100, the database is exhausted and the artifacts lock forever.</p>
 
-  <p style="margin-top: 48px; font-style: italic;">
+  <p style="margin-top: 36px; font-style: italic;">
     Click anywhere to advance and uncover the master text canvas...
   </p>
 </div>
@@ -307,4 +309,3 @@ setTimeout(() => { body.classList.remove('animating'); }, 1400);
 });
 </script>
 </body>
-</html>
