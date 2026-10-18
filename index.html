@@ -54,9 +54,9 @@ from, to { background-color: transparent }
 50% { background-color: #000000; }
 }
 .info-loop {
+font-size: 1.1rem;
 max-width: 600px;
 width: 90%;
-font-size: 1.1rem;
 line-height: 1.8;
 color: #222222;
 opacity: 0;
@@ -130,42 +130,48 @@ cursor: default !important;
 Errata incorrecta<span class="cursor"></span>
 </div>
 <div class="info-loop">
-<p>You have entered the digital and acoustic space of an art project.</p>
-<p>A single text scattered in the city, awaiting physical recovery.</p>
-<p style="margin-top: 36px;"><em>More information to follow...</em></p>
+  <p>You have entered Errata incorrecta: a digital art project exploring the role of mistakes, friction, and structural accidents in creative code, text, and audio.</p>
+
+  <p>This project turns the spotlight directly onto its own source mechanics. The repository is public, open for review, and functions as an open public gallery targeting developers and tracking automated scraper traffic as its primary audience. This project was built entirely through human-AI collaboration, using machine assistance to engineer the very logic that corrupts the text.</p>
+
+  <p><strong>[SYSTEM PARAMETERS & PROVENANCE]</strong><br>
+  • <strong>The Spectator Mode:</strong> Casual interactions run locally in your browser's temporary memory, leaving zero digital footprint.<br>
+  • <strong>The GitHub Portal:</strong> Connecting via GitHub authorizes you to interact with the project grid independently. You can sign the public guestbook at any time, or, if you are among the first 100 authenticated human arrivals, claim one unique, certified text error copy permanently stamped into the public ledger view. Beyond user 100, the database is exhausted and the artifacts lock forever.</p>
+
+  <p style="margin-top: 36px; font-style: italic;">
+    Click anywhere to advance and uncover the master text canvas... <br>
+    <span style="font-size: 0.9rem; opacity: 0.6;">[System status: Under construction. More information to follow.]</span>
+  </p>
 </div>
-
 <!-- STAGE 2 VISUAL: THE ERRATA POETIC SEQUENCE -->
-<div class="code-display errata-block"><span class="serif-text">Errata: connection loop error:</span>function startVoiceOfPi() {
-  stopDuchampChoirSoundOnly();
-  masterGain = audioCtx.createGain();
-  masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
-<span class="serif-text">πί is playing silently in a closed circle</span>  masterGain.connect(masterGain); 
-  createVoiceLine(scaleOfPi, 3000); 
-}</div>
-
+<div class="code-display errata-block"><span class="serif-text">Errata: connection loop
+error:</span>function startVoiceOfPi() {
+stopDuchampChoirSoundOnly();
+masterGain = audioCtx.createGain();
+masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime);</div>
 <!-- STAGE 3 VISUAL: THE CORRECTION -->
 <div class="code-display corrected-block">function startVoiceOfPi() {
-  stopDuchampChoirSoundOnly();
-  masterGain = audioCtx.createGain();
-  masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
-  masterGain.connect(audioCtx.destination); 
-<span class="serif-text">My voice, with a natural baseline frequency of 327 Hz, enters the code as an idealized, mathematical crystal version, replacing Marcel's own geometric and abstract voice:</span>
-  createVoiceLine(baseScale, 1800);  // Yvonne
-  createVoiceLine(baseScale, 2400);  // Magdeleine
-  createVoiceLine(scaleOfPi, 3000);  // πί (replaces Marcel)
+stopDuchampChoirSoundOnly();
+masterGain = audioCtx.createGain();
+masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+masterGain.connect(audioCtx.destination);
+<span class="serif-text">My voice, with a natural baseline frequency of 327 Hz, enters the
+code as an idealized, mathematical crystal version, replacing Marcel's own geometric and
+abstract voice:</span>
+createVoiceLine(baseScale, 1800); // Yvonne
+createVoiceLine(baseScale, 2400); // Magdeleine
+createVoiceLine(scaleOfPi, 3000); // πί (replaces Marcel)
 }</div>
 </div>
-
 <script>
 const body = document.body;
 let audioCtx = null;
 let masterGain = null;
 let activeVoices = [];
 let sequenceIntervals = [];
-const baseScale = [87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23];
+const baseScale = [87.31, 98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00,
+220.00, 246.94, 261.63, 293.66, 329.63, 349.23];
 const scaleOfPi = [40.87, 81.75, 122.62, 163.50, 218.00, 327.00, 490.50, 654.00];
-
 function generateDuchampHat(scale) {
 let hat = [];
 for (let i = 0; i < 25; i++) {
@@ -177,7 +183,6 @@ const j = Math.floor(Math.random() * (i + 1));
 }
 return hat;
 }
-
 function createVoiceLine(scale, speedMs) {
 const osc = audioCtx.createOscillator();
 osc.type = 'sine';
@@ -191,51 +196,46 @@ voiceGain.connect(masterGain);
 osc.start();
 activeVoices.push(osc);
 const interval = setInterval(() => {
-cardIndex++;
 if (cardIndex >= 25) {
 currentHat = generateDuchampHat(scale);
 cardIndex = 0;
 }
 const nextFreq = currentHat[cardIndex];
 osc.frequency.exponentialRampToValueAtTime(nextFreq, audioCtx.currentTime + 0.6);
+cardIndex++;
 }, speedMs);
 sequenceIntervals.push(interval);
 }
-
 function startDuchampChoir() {
 if (!audioCtx) {
 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 masterGain = audioCtx.createGain();
-masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
+masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime);
 masterGain.connect(audioCtx.destination);
 createVoiceLine(baseScale, 1800); // Yvonne
 createVoiceLine(baseScale, 2400); // Magdeleine
 createVoiceLine(baseScale, 3000); // Marcel
 }
-
 function startSilentPiLoop() {
 stopDuchampChoirSoundOnly();
 masterGain = audioCtx.createGain();
-masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
-masterGain.connect(masterGain); 
+masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+masterGain.connect(masterGain);
 createVoiceLine(scaleOfPi, 3000);
 }
-
 function startAudiblePiScale() {
 sequenceIntervals.forEach(interval => clearInterval(interval));
 sequenceIntervals = [];
 activeVoices.forEach(osc => { try { osc.stop(); osc.disconnect(); } catch(e) {} });
 activeVoices = [];
-
 masterGain = audioCtx.createGain();
-masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime); 
-masterGain.connect(audioCtx.destination); 
-createVoiceLine(baseScale, 1800);  // Yvonne
-createVoiceLine(baseScale, 2400);  // Magdeleine
-createVoiceLine(scaleOfPi, 3000);  // πί (replaces Marcel)
+masterGain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+masterGain.connect(audioCtx.destination);
+createVoiceLine(baseScale, 1800); // Yvonne
+createVoiceLine(baseScale, 2400); // Magdeleine
+createVoiceLine(scaleOfPi, 3000); // πί (replaces Marcel)
 }
-
 function stopDuchampChoirSoundOnly() {
 sequenceIntervals.forEach(interval => clearInterval(interval));
 sequenceIntervals = [];
@@ -249,7 +249,6 @@ activeVoices = [];
 masterGain = null;
 }, 450);
 }
-
 body.addEventListener('click', function(e) {
 if (e.target.tagName === 'A') return;
 if (body.classList.contains('state-1')) {
@@ -287,4 +286,3 @@ setTimeout(() => { body.classList.remove('animating'); }, 1400);
 </script>
 </body>
 </html>
-
