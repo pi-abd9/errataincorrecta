@@ -109,12 +109,36 @@ margin-top: 14px;
 margin-bottom: 14px;
 font-style: italic;
 }
+/* WATERMARK STRUCTURE: Hidden by default, absolute positioned at bottom */
+.system-watermark {
+position: absolute;
+bottom: 24px;
+left: 5%;
+width: 90%;
+font-family: "Courier New", Courier, monospace;
+font-size: 0.85rem;
+letter-spacing: 2px;
+color: #000000;
+opacity: 0;
+pointer-events: none;
+white-space: nowrap;
+text-transform: uppercase;
+transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
+}
+/* Show watermark fainted on all screens except initial state-1 */
+body.stage-reveal-all .system-watermark,
+body.stage-errata-silence .system-watermark,
+body.stage-pi-voice .system-watermark {
+opacity: 0.04; 
+}
 body.stage-wipeout .title-container,
 body.stage-wipeout .info-loop,
 body.stage-wipeout .code-display,
+body.stage-wipeout .system-watermark,
 body.stage-reset-wipeout .title-container,
 body.stage-reset-wipeout .info-loop,
-body.stage-reset-wipeout .code-display {
+body.stage-reset-wipeout .code-display,
+body.stage-reset-wipeout .system-watermark {
 opacity: 0 !important;
 transition: none !important;
 }
@@ -135,12 +159,11 @@ Errata incorrecta<span class="cursor"></span>
   <p>This project turns the spotlight directly onto its own source mechanics. The repository is public, open for review, and functions as an open public gallery targeting developers and tracking automated scraper traffic as its primary audience. This project was built entirely through human-AI collaboration, using machine assistance to engineer the very logic that corrupts the text.</p>
 
   <p><strong>[SYSTEM PARAMETERS & PROVENANCE]</strong><br>
-  • <strong>The Spectator Mode:</strong> Casual interactions run locally in your browser's temporary memory, leaving zero digital footprint.</br>
+  • <strong>The Spectator Mode:</strong> Casual interactions run locally in your browser's temporary memory, leaving zero digital footprint.<br>
   • <strong>The GitHub Portal:</strong> Connecting via GitHub authorizes you to interact with the project grid independently. You can sign the public guestbook at any time, or, if you are among the first 100 authenticated human arrivals, claim one unique, certified text error copy permanently stamped into the public ledger view. Beyond user 100, the database is exhausted and the artifacts lock forever.</p>
 
-  <p style="margin-top: 36px; font-style: italic;">
-    Click anywhere to advance and uncover the master text canvas... <br>
-    <span style="font-size: 0.9rem; opacity: 0.6;">[System status: Under construction. More information to follow.]</span>
+  <p style="margin-top: 48px; font-style: italic;">
+    Click anywhere to advance and uncover the master text canvas...
   </p>
 </div>
 <!-- STAGE 2 VISUAL: THE ERRATA POETIC SEQUENCE -->
@@ -162,6 +185,8 @@ createVoiceLine(baseScale, 1800); // Yvonne
 createVoiceLine(baseScale, 2400); // Magdeleine
 createVoiceLine(scaleOfPi, 3000); // πί (replaces Marcel)
 }</div>
+<!-- FAINT SYSTEM BACKGROUND WATERMARK -->
+<div class="system-watermark">[ System Status: Under Construction // Core Infrastructure Evolving // Build Alpha-2026 ]</div>
 </div>
 <script>
 const body = document.body;
@@ -283,6 +308,3 @@ setTimeout(() => { body.classList.remove('animating'); }, 1400);
 }, 800);
 }
 });
-</script>
-</body>
-</html>
