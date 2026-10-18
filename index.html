@@ -109,7 +109,6 @@ margin-top: 14px;
 margin-bottom: 14px;
 font-style: italic;
 }
-/* WATERMARK STRUCTURE: Hidden by default, absolute positioned at bottom */
 .system-watermark {
 position: absolute;
 bottom: 24px;
@@ -125,7 +124,6 @@ white-space: nowrap;
 text-transform: uppercase;
 transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
 }
-/* Show watermark fainted on all screens except initial state-1 */
 body.stage-reveal-all .system-watermark,
 body.stage-errata-silence .system-watermark,
 body.stage-pi-voice .system-watermark {
@@ -185,7 +183,6 @@ createVoiceLine(baseScale, 1800); // Yvonne
 createVoiceLine(baseScale, 2400); // Magdeleine
 createVoiceLine(scaleOfPi, 3000); // πί (replaces Marcel)
 }</div>
-<!-- FAINT SYSTEM BACKGROUND WATERMARK -->
 <div class="system-watermark">[ System Status: Under Construction // Core Infrastructure Evolving // Build Alpha-2026 ]</div>
 </div>
 <script>
@@ -308,3 +305,6 @@ setTimeout(() => { body.classList.remove('animating'); }, 1400);
 }, 800);
 }
 });
+</script>
+</body>
+</html>
